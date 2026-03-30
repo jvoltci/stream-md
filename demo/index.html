@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>StreamMD — Demo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #020817;
+      color: #e2e8f0;
+      min-height: 100vh;
+    }
+
+    .hero {
+      text-align: center;
+      padding: 48px 24px 24px;
+      position: relative;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 50%; transform: translateX(-50%);
+      width: 600px; height: 300px;
+      background: radial-gradient(ellipse, rgba(99,102,241,0.12), transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero h1 {
+      font-size: clamp(2rem, 6vw, 4rem);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 30%, #818cf8 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero p { color: #94a3b8; font-size: 1.1rem; margin-top: 8px; }
+
+    .badges { display: flex; gap: 8px; justify-content: center; margin-top: 16px; flex-wrap: wrap; }
+    .badge {
+      padding: 4px 12px; border-radius: 999px; font-size: 0.7rem; font-weight: 600;
+      border: 1px solid;
+    }
+    .badge-green { background: rgba(16,185,129,0.1); color: #34d399; border-color: rgba(16,185,129,0.2); }
+    .badge-indigo { background: rgba(99,102,241,0.1); color: #a5b4fc; border-color: rgba(99,102,241,0.2); }
+    .badge-amber { background: rgba(245,158,11,0.1); color: #fbbf24; border-color: rgba(245,158,11,0.2); }
+
+    /* Controls */
+    .controls {
+      max-width: 900px; margin: 24px auto; padding: 0 24px;
+      display: flex; gap: 12px; align-items: center; justify-content: center; flex-wrap: wrap;
+    }
+    .btn {
+      padding: 8px 20px; border-radius: 10px; font-size: 0.85rem; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.15s;
+    }
+    .btn-primary { background: #6366f1; color: #fff; }
+    .btn-primary:hover { background: #818cf8; }
+    .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-danger { background: rgba(239,68,68,0.1); color: #f87171; border: 1px solid rgba(239,68,68,0.2); }
+    .btn-ghost { background: rgba(255,255,255,0.05); color: #94a3b8; border: 1px solid rgba(255,255,255,0.1); }
+    .btn-ghost:hover { color: #fff; background: rgba(255,255,255,0.1); }
+
+    .speed-btns { display: flex; gap: 6px; }
+    .speed-btn {
+      padding: 6px 14px; border-radius: 8px; font-size: 0.75rem; font-family: 'JetBrains Mono', monospace;
+      cursor: pointer; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);
+      color: #94a3b8; transition: all 0.15s;
+    }
+    .speed-btn.active { background: #6366f1; color: #fff; border-color: transparent; box-shadow: 0 4px 12px rgba(99,102,241,0.3); }
+
+    /* Comparison */
+    .comparison {
+      max-width: 900px; margin: 0 auto; padding: 0 24px 48px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    }
+    @media (max-width: 768px) { .comparison { grid-template-columns: 1fr; } }
+
+    .panel {
+      border-radius: 16px; overflow: hidden;
+      border: 1px solid;
+      background: rgba(255,255,255,0.01);
+    }
+    .panel-old { border-color: rgba(239,68,68,0.2); }
+    .panel-new { border-color: rgba(16,185,129,0.2); }
+
+    .panel-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .panel-header-left { display: flex; align-items: center; gap: 8px; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; }
+    .dot-red { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+    .dot-green { background: #10b981; box-shadow: 0 0 8px #10b981; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+
+    .panel-title { font-size: 0.8rem; font-weight: 700; }
+    .panel-title-red { color: #f87171; }
+    .panel-title-green { color: #34d399; }
+    .panel-subtitle { font-size: 0.65rem; color: #475569; font-family: 'JetBrains Mono', monospace; }
+
+    .panel-body {
+      height: 400px; overflow-y: auto; padding: 16px;
+    }
+
+    .panel-footer {
+      display: flex; gap: 16px; padding: 8px 16px;
+      border-top: 1px solid rgba(255,255,255,0.05);
+      background: rgba(0,0,0,0.2);
+    }
+    .metric { font-size: 0.7rem; font-family: 'JetBrains Mono', monospace; color: #475569; }
+    .metric-val-red { color: #f87171; font-weight: 600; }
+    .metric-val-green { color: #34d399; font-weight: 600; }
+
+    /* Naive rendering styles */
+    .naive-render { font-size: 14px; line-height: 1.7; color: #e2e8f0; white-space: pre-wrap; word-wrap: break-word; }
+
+    /* StreamMD styles (inlined from CSS) */
+    .stream-md { font-family: 'Inter', system-ui, sans-serif; font-size: 15px; line-height: 1.7; color: #e2e8f0; }
+    .stream-md > .smd-block + .smd-block { margin-top: 0.25em; }
+    .smd-block-active::after {
+      content: ''; display: inline-block; width: 2px; height: 1.1em;
+      background: #818cf8; margin-left: 2px; vertical-align: text-bottom;
+      animation: smd-blink 1s steps(2) infinite;
+    }
+    @keyframes smd-blink { 0% { opacity: 1; } 50% { opacity: 0; } }
+    .smd-heading { color: #fff; font-weight: 700; line-height: 1.3; margin: 1.2em 0 0.5em; }
+    .smd-heading:first-child { margin-top: 0; }
+    .smd-h1 { font-size: 1.875em; letter-spacing: -0.02em; }
+    .smd-h2 { font-size: 1.5em; }
+    .smd-h3 { font-size: 1.25em; }
+    .smd-paragraph { margin: 0.5em 0; }
+    .smd-paragraph:first-child { margin-top: 0; }
+    .smd-code-block { position: relative; margin: 1em 0; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); background: rgba(0,0,0,0.3); }
+    .smd-code-header { display: flex; align-items: center; justify-content: space-between; padding: 8px 16px; background: rgba(255,255,255,0.03); border-bottom: 1px solid rgba(255,255,255,0.05); }
+    .smd-code-lang { font-size: 0.7em; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.4); }
+    .smd-code-copy { font-size: 0.7em; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.35); background: transparent; border: 1px solid rgba(255,255,255,0.1); border-radius: 6px; padding: 3px 10px; cursor: pointer; }
+    .smd-code-copy:hover { color: #e2e8f0; background: rgba(255,255,255,0.05); }
+    .smd-pre { margin: 0; padding: 16px; overflow-x: auto; }
+    .smd-code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; line-height: 1.6; }
+    .smd-hl-keyword { color: #c084fc; } .smd-hl-string { color: #86efac; } .smd-hl-comment { color: #64748b; font-style: italic; }
+    .smd-hl-number { color: #fbbf24; } .smd-hl-builtin { color: #67e8f9; } .smd-hl-punctuation { color: #94a3b8; }
+    .smd-inline-code { font-family: 'JetBrains Mono', monospace; font-size: 0.85em; padding: 0.2em 0.4em; border-radius: 6px; background: rgba(255,255,255,0.08); color: #f0abfc; border: 1px solid rgba(255,255,255,0.06); }
+    .smd-link { color: #818cf8; text-decoration: none; border-bottom: 1px solid transparent; }
+    .smd-link:hover { border-bottom-color: #818cf8; }
+    .smd-list { margin: 0.5em 0; padding-left: 1.5em; }
+    .smd-list-item { margin: 0.25em 0; }
+    .smd-list-item::marker { color: rgba(255,255,255,0.3); }
+    .smd-blockquote { margin: 0.75em 0; padding: 0.5em 1em; border-left: 3px solid #818cf8; background: rgba(129,140,248,0.05); border-radius: 0 8px 8px 0; color: rgba(255,255,255,0.7); font-style: italic; }
+    .smd-hr { border: none; height: 1px; background: rgba(255,255,255,0.1); margin: 1.5em 0; }
+    .stream-md strong { color: #fff; font-weight: 600; }
+    .stream-md em { font-style: italic; }
+    .smd-table-wrapper { margin: 1em 0; overflow-x: auto; border-radius: 10px; border: 1px solid rgba(255,255,255,0.08); }
+    .smd-table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+    .smd-table th { background: rgba(255,255,255,0.04); padding: 10px 16px; font-weight: 600; color: #fff; border-bottom: 1px solid rgba(255,255,255,0.08); }
+    .smd-table td { padding: 10px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); }
+  </style>
+</head>
+<body>
+  <div class="hero">
+    <h1>StreamMD</h1>
+    <p>Streaming markdown renderer for LLM token streams. <strong style="color:#fff">Zero flicker.</strong></p>
+    <div class="badges">
+      <span class="badge badge-green">Incremental Parsing</span>
+      <span class="badge badge-indigo">Syntax Highlighting</span>
+      <span class="badge badge-amber">React.memo'd Blocks</span>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="speed-btns">
+      <button class="speed-btn active" data-speed="20">20 tok/s</button>
+      <button class="speed-btn" data-speed="50">50 tok/s</button>
+      <button class="speed-btn" data-speed="100">100 tok/s</button>
+    </div>
+    <button class="btn btn-primary" id="start-btn">▶ Start Stream</button>
+    <button class="btn btn-danger" id="stop-btn" disabled>■ Stop</button>
+    <button class="btn btn-ghost" id="reset-btn">↺ Reset</button>
+  </div>
+
+  <div class="comparison">
+    <!-- Naive Panel -->
+    <div class="panel panel-old">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <span class="dot dot-red"></span>
+          <span class="panel-title panel-title-red">Naive (innerHTML)</span>
+        </div>
+        <span class="panel-subtitle">re-parse every token</span>
+      </div>
+      <div class="panel-body" id="naive-body">
+        <div class="naive-render" id="naive-render"></div>
+      </div>
+      <div class="panel-footer">
+        <span class="metric">Renders: <span class="metric-val-red" id="naive-renders">0</span></span>
+        <span class="metric">Blocks: <span class="metric-val-red" id="naive-blocks">—</span></span>
+      </div>
+    </div>
+
+    <!-- StreamMD Panel -->
+    <div class="panel panel-new">
+      <div class="panel-header">
+        <div class="panel-header-left">
+          <span class="dot dot-green"></span>
+          <span class="panel-title panel-title-green">StreamMD (incremental)</span>
+        </div>
+        <span class="panel-subtitle">only active block re-renders</span>
+      </div>
+      <div class="panel-body" id="smd-body">
+        <div class="stream-md" id="smd-render"></div>
+      </div>
+      <div class="panel-footer">
+        <span class="metric">Renders: <span class="metric-val-green" id="smd-renders">0</span></span>
+        <span class="metric">Blocks: <span class="metric-val-green" id="smd-blocks">0</span></span>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    // ── Demo text (realistic LLM markdown output) ──
+    const DEMO_MD = `# Understanding Language Models
+
+Language models represent one of the most **fascinating developments** in modern computer science. At their core, these systems transform sequences of tokens into probability distributions.
+
+## How Attention Works
+
+The attention mechanism, introduced in the landmark *"Attention Is All You Need"* paper, replaced recurrent architectures entirely.
+
+Here's a simplified self-attention implementation:
+
+\`\`\`python
+import torch
+import torch.nn.functional as F
+
+def self_attention(Q, K, V):
+    """Scaled dot-product attention."""
+    d_k = Q.size(-1)
+    scores = torch.matmul(Q, K.transpose(-2, -1)) / d_k ** 0.5
+    weights = F.softmax(scores, dim=-1)
+    return torch.matmul(weights, V)
+\`\`\`
+
+### Key Properties
+
+- **Parallelizable**: Unlike RNNs, all positions compute simultaneously
+- **Long-range**: Can attend to any previous position directly
+- **Scalable**: Performance improves predictably with scale
+- Self-attention has \`O(n²)\` complexity in sequence length
+
+> The transformer architecture proved that parallelizable self-attention could capture long-range dependencies more effectively than LSTMs or GRUs ever could.
+
+## Performance Comparison
+
+| Model | Parameters | Context Window | Speed |
+|-------|-----------|---------------|-------|
+| GPT-4 | 1.8T | 128k | 50 tok/s |
+| Claude 3.5 | Unknown | 200k | 80 tok/s |
+| Gemini 2 | Unknown | 2M | 100 tok/s |
+
+## The Streaming Challenge
+
+When a model generates tokens at **100+ tokens per second**, traditional DOM rendering creates visible layout thrashing:
+
+\`\`\`javascript
+// The naive approach — re-renders EVERYTHING
+function NaiveChat({ text }) {
+  // This re-parses the entire markdown on every token
+  return <ReactMarkdown>{text}</ReactMarkdown>;
+}
+
+// The StreamMD approach — only active block updates
+function SmartChat({ text }) {
+  return <StreamMD text={text} theme="dark" />;
+}
+\`\`\`
+
+This is why we built **StreamMD** — incremental parsing means only the *current block* re-renders. Every completed block is frozen via \`React.memo\`.
+
+---
+
+The future of LLM interfaces demands **streaming-first** rendering. We're just getting started.`;
+
+    // ── Tokenize ──
+    function tokenize(text) {
+      const result = [];
+      const regex = /(\S+|\s+)/g;
+      let match;
+      while ((match = regex.exec(text)) !== null) result.push(match[0]);
+      return result;
+    }
+
+    const TOKENS = tokenize(DEMO_MD);
+
+    // ── Minimal inline StreamMD parser (for demo without React) ──
+    class DemoStreamParser {
+      constructor() { this.blocks = []; this.buffer = ''; this.prevLen = 0; this.inFence = false; this.fenceCount = 0; this.fenceChar = ''; this.bid = 0; this.incompleteLine = ''; }
+      push(fullText) {
+        const newContent = fullText.slice(this.prevLen);
+        this.prevLen = fullText.length;
+        this.buffer += newContent;
+        const lines = this.buffer.split('\n');
+        const incomplete = this.buffer.endsWith('\n') ? '' : lines.pop();
+        for (const line of lines) this._processLine(line);
+        this.incompleteLine = incomplete || '';
+        this.buffer = this.incompleteLine;
+        return this.blocks;
+      }
+      getIncompleteLine() { return this.incompleteLine; }
+      reset() { this.blocks = []; this.buffer = ''; this.prevLen = 0; this.inFence = false; this.bid = 0; this.incompleteLine = ''; }
+      _active() { const l = this.blocks[this.blocks.length-1]; return l && !l.closed ? l : null; }
+      _close() { const a = this._active(); if (a) a.closed = true; }
+      _start(type, content, meta={}) { this.blocks.push({ id: 'b'+(++this.bid), type, content, closed: false, meta }); }
+      _processLine(line) {
+        if (this.inFence) {
+          const t = line.trimStart();
+          if (t.length >= this.fenceCount && [...t].every((c,i) => i >= this.fenceCount || c === this.fenceChar) && t.slice(this.fenceCount).trim() === '') {
+            this.inFence = false; const a = this._active(); if(a) a.closed = true; return;
+          }
+          const a = this._active(); if(a) a.content += line + '\n'; return;
+        }
+        if (line.trim() === '') { this._close(); return; }
+        let m;
+        if ((m = line.match(/^(`{3,}|~{3,})\s*([\w+-]*)/))) { this._close(); this.inFence = true; this.fenceChar = m[1][0]; this.fenceCount = m[1].length; this._start('code', '', { language: m[2]||'' }); return; }
+        if ((m = line.match(/^(#{1,6})\s+(.*)$/))) { this._close(); this._start('heading', m[2], { level: m[1].length }); this._active().closed = true; return; }
+        if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(line.trim())) { this._close(); this._start('hr', ''); this._active().closed = true; return; }
+        if ((m = line.match(/^>\s?(.*)/))) { const a = this._active(); if(a && a.type==='blockquote' && !a.closed) { a.content += '\n'+m[1]; } else { this._close(); this._start('blockquote', m[1]); } return; }
+        if ((m = line.match(/^\s*[-*+]\s+(.*)/))) { const a = this._active(); if(a && a.type==='list' && !a.closed) { a.content += '\n'+line; } else { this._close(); this._start('list', line, {ordered:false}); } return; }
+        if ((m = line.match(/^\s*\d+[.)]\s+(.*)/))) { const a = this._active(); if(a && a.type==='list' && !a.closed) { a.content += '\n'+line; } else { this._close(); this._start('list', line, {ordered:true}); } return; }
+        if (line.includes('|')) { const a = this._active(); if(a && a.type==='table' && !a.closed) { a.content+='\n'+line; return; } if(line.trim().startsWith('|')) { this._close(); this._start('table', line); return; } }
+        const a = this._active(); if(a && a.type==='paragraph' && !a.closed) { a.content += '\n'+line; } else { this._close(); this._start('paragraph', line); }
+      }
+    }
+
+    // ── Renderers ──
+    function escapeHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    function renderInline(text) {
+      let out = escapeHtml(text);
+      out = out.replace(/\*\*\*(.+?)\*\*\*/g, '<strong><em>$1</em></strong>');
+      out = out.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+      out = out.replace(/\*(.+?)\*/g, '<em>$1</em>');
+      out = out.replace(/`(.+?)`/g, '<code class="smd-inline-code">$1</code>');
+      out = out.replace(/\[(.+?)\]\((.+?)\)/g, '<a class="smd-link" href="$2">$1</a>');
+      out = out.replace(/~~(.+?)~~/g, '<del>$1</del>');
+      return out;
+    }
+
+    function highlightCode(code, lang) {
+      let html = escapeHtml(code);
+      const kwSets = {
+        python: /\b(import|from|def|class|return|if|elif|else|for|while|with|as|True|False|None|and|or|not|in|is)\b/g,
+        javascript: /\b(const|let|var|function|return|if|else|for|while|new|this|class|import|export|from|async|await|true|false|null|undefined)\b/g,
+        typescript: /\b(const|let|var|function|return|if|else|for|while|new|this|class|import|export|from|async|await|true|false|null|undefined|type|interface)\b/g,
+      };
+      const kw = kwSets[lang] || kwSets.javascript;
+      // Simple safe replacements to avoid colliding with injected spans
+      html = html.replace(kw, '<span class="smd-hl-keyword">$1</span>');
+      html = html.replace(/\b(\d+\.?\d*)\b/g, '<span class="smd-hl-number">$1</span>');
+      html = html.replace(/(#.*$|\/\/.*$)/gm, '<span class="smd-hl-comment">$1</span>');
+      return html;
+    }
+
+    function renderBlock(block) {
+      switch(block.type) {
+        case 'heading': return `<h${block.meta.level} class="smd-heading smd-h${block.meta.level}">${renderInline(block.content)}</h${block.meta.level}>`;
+        case 'paragraph': return `<p class="smd-paragraph">${renderInline(block.content)}</p>`;
+        case 'code': {
+          const code = block.content.endsWith('\n') ? block.content.slice(0,-1) : block.content;
+          const lang = block.meta.language || '';
+          return `<div class="smd-code-block"><div class="smd-code-header"><span class="smd-code-lang">${lang}</span><button class="smd-code-copy" onclick="navigator.clipboard.writeText(this.closest('.smd-code-block').querySelector('code').textContent)">Copy</button></div><pre class="smd-pre"><code class="smd-code">${highlightCode(code, lang)}</code></pre></div>`;
+        }
+        case 'list': {
+          const items = block.content.split('\n').map(l => { const m = l.match(/^\s*(?:[-*+]|\d+[.)]) \s*(.*)/); return m ? m[1] : l; });
+          const tag = block.meta.ordered ? 'ol' : 'ul';
+          return `<${tag} class="smd-list smd-list-${block.meta.ordered?'ol':'ul'}">${items.map(i => `<li class="smd-list-item">${renderInline(i)}</li>`).join('')}</${tag}>`;
+        }
+        case 'blockquote': return `<blockquote class="smd-blockquote">${renderInline(block.content)}</blockquote>`;
+        case 'table': {
+          const rows = block.content.split('\n').filter(l => l.trim());
+          if (rows.length === 0) return '';
+          const parse = l => l.split('|').map(s=>s.trim()).filter((_,i,a) => !((i===0||i===a.length-1) && a[i]?.trim()===''));
+          const hdr = parse(rows[0]);
+          let di = 1;
+          if (rows.length > 1 && /^[\s|:\-]+$/.test(rows[1])) di = 2;
+          const data = rows.slice(di).map(parse);
+          return `<div class="smd-table-wrapper"><table class="smd-table"><thead><tr>${hdr.map(h=>`<th>${renderInline(h)}</th>`).join('')}</tr></thead><tbody>${data.map(r=>`<tr>${r.map(c=>`<td>${renderInline(c)}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
+        }
+        case 'hr': return '<hr class="smd-hr">';
+        default: return `<p class="smd-paragraph">${renderInline(block.content)}</p>`;
+      }
+    }
+
+    // ── State ──
+    let speed = 20, streaming = false, timer = null, tokenIdx = 0, text = '';
+    let naiveRenders = 0;
+    const parser = new DemoStreamParser();
+
+    const naiveEl = document.getElementById('naive-render');
+    const smdEl = document.getElementById('smd-render');
+    const naiveRendersEl = document.getElementById('naive-renders');
+    const naiveBlocksEl = document.getElementById('naive-blocks');
+    const smdRendersEl = document.getElementById('smd-renders');
+    const smdBlocksEl = document.getElementById('smd-blocks');
+    const startBtn = document.getElementById('start-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    const resetBtn = document.getElementById('reset-btn');
+
+    // ── Speed buttons ──
+    document.querySelectorAll('.speed-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        speed = parseInt(btn.dataset.speed);
+        if (streaming) { clearInterval(timer); timer = setInterval(tick, 1000/speed); }
+      });
+    });
+
+    function tick() {
+      if (tokenIdx >= TOKENS.length) { stop(); return; }
+      text += TOKENS[tokenIdx++];
+
+      // Naive: re-render everything (simulates react-markdown behavior)
+      naiveRenders++;
+      naiveEl.textContent = text;
+      naiveRendersEl.textContent = naiveRenders;
+      naiveBlocksEl.textContent = '—';
+      document.getElementById('naive-body').scrollTop = document.getElementById('naive-body').scrollHeight;
+
+      // StreamMD: incremental block parsing
+      const blocks = parser.push(text);
+      const activeIdx = blocks.length - 1;
+      const incompleteLine = parser.getIncompleteLine();
+
+      // Only update active block's DOM, keep completed blocks stable
+      let html = '';
+      for (let i = 0; i < blocks.length; i++) {
+        const cls = i === activeIdx && !blocks[i].closed ? 'smd-block smd-block-active' : 'smd-block';
+        // For the active block, temporarily append the incomplete line for rendering
+        if (i === activeIdx && !blocks[i].closed && incompleteLine) {
+          const displayBlock = { ...blocks[i], content: blocks[i].content + (blocks[i].content ? '\n' : '') + incompleteLine };
+          html += `<div class="${cls}">${renderBlock(displayBlock)}</div>`;
+        } else {
+          html += `<div class="${cls}">${renderBlock(blocks[i])}</div>`;
+        }
+      }
+      // If no active block but there's an incomplete line, show it as a pending paragraph
+      if (incompleteLine && (blocks.length === 0 || blocks[blocks.length-1].closed)) {
+        html += `<div class="smd-block smd-block-active"><p class="smd-paragraph">${renderInline(incompleteLine)}</p></div>`;
+      }
+      smdEl.innerHTML = html;
+      smdRendersEl.textContent = blocks.length;
+      smdBlocksEl.textContent = blocks.filter(b => b.closed).length;
+      document.getElementById('smd-body').scrollTop = document.getElementById('smd-body').scrollHeight;
+    }
+
+    function start() {
+      if (streaming) return;
+      streaming = true;
+      startBtn.disabled = true;
+      stopBtn.disabled = false;
+      timer = setInterval(tick, 1000/speed);
+    }
+
+    function stop() {
+      streaming = false;
+      startBtn.disabled = false;
+      stopBtn.disabled = true;
+      if (timer) { clearInterval(timer); timer = null; }
+    }
+
+    function reset() {
+      stop();
+      tokenIdx = 0; text = ''; naiveRenders = 0;
+      parser.reset();
+      naiveEl.textContent = '';
+      smdEl.innerHTML = '';
+      naiveRendersEl.textContent = '0';
+      naiveBlocksEl.textContent = '—';
+      smdRendersEl.textContent = '0';
+      smdBlocksEl.textContent = '0';
+    }
+
+    startBtn.addEventListener('click', start);
+    stopBtn.addEventListener('click', stop);
+    resetBtn.addEventListener('click', reset);
+  </script>
+</body>
+</html>

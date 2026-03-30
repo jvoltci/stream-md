@@ -1,0 +1,68 @@
+{
+  "name": "stream-md",
+  "version": "0.1.0",
+  "description": "Streaming markdown renderer for LLM token streams. Incremental parsing, zero flicker, built-in syntax highlighting.",
+  "keywords": [
+    "markdown",
+    "streaming",
+    "llm",
+    "react",
+    "incremental",
+    "chat",
+    "ai",
+    "gpt",
+    "claude",
+    "syntax-highlighting",
+    "zero-flicker"
+  ],
+  "author": "Jai",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jvoltci/stream-md"
+  },
+  "homepage": "https://altrusian.com/streammd",
+  "bugs": {
+    "url": "https://github.com/jvoltci/stream-md/issues"
+  },
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./styles.css": "./dist/stream-md.css"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.5.0"
+  }
+}
