@@ -1,178 +1,234 @@
-// ═══════════════════════════════════════════════════════════════
-// StreamMD — Block Components
-// ═══════════════════════════════════════════════════════════════
-
-import React, { memo, useState, useCallback } from "react";
-import type { Block, ComponentOverrides } from "../parser/types";
+import * as React from "react";
+import { memo, useState, useCallback, useMemo } from "react";
+import type {
+  Block,
+  ComponentOverrides,
+  HighlighterFn,
+  InlinePlugin,
+} from "../parser/types";
 import { InlineRenderer } from "./InlineRenderer";
-import { highlight } from "../highlight/highlighter";
+import { highlight as defaultHighlight } from "../highlight/highlighter";
+import {
+  parseTable,
+  parseListItems,
+  type ParsedListItem,
+  type ParsedTable,
+} from "../parser/StreamParser";
 
-// ── Heading ──────────────────────────────────────────────────
+// ── Heading ──
 
-interface HeadingProps {
+interface BlockProps {
   block: Block;
   overrides?: Partial<ComponentOverrides>;
+  inlinePlugins?: InlinePlugin[];
+  isActive?: boolean;
 }
 
-export const HeadingBlock = memo(function HeadingBlock({ block, overrides }: HeadingProps) {
-  const level = block.meta.level || 1;
+export const HeadingBlock = memo(function HeadingBlock({
+  block,
+  overrides,
+  inlinePlugins,
+}: BlockProps) {
+  const level = block.meta.level ?? 1;
   const Tag = `h${level}` as keyof React.JSX.IntrinsicElements;
   const className = `smd-heading smd-h${level}`;
-
   return (
     <Tag className={className}>
-      <InlineRenderer text={block.content} overrides={overrides} />
+      <InlineRenderer
+        text={block.content}
+        {...(overrides ? { overrides } : {})}
+        {...(inlinePlugins ? { inlinePlugins } : {})}
+      />
     </Tag>
   );
 });
 
-// ── Paragraph ────────────────────────────────────────────────
+// ── Paragraph ──
 
-interface ParagraphProps {
-  block: Block;
-  overrides?: Partial<ComponentOverrides>;
-}
-
-export const ParagraphBlock = memo(function ParagraphBlock({ block, overrides }: ParagraphProps) {
+export const ParagraphBlock = memo(function ParagraphBlock({
+  block,
+  overrides,
+  inlinePlugins,
+}: BlockProps) {
   return (
     <p className="smd-paragraph">
-      <InlineRenderer text={block.content} overrides={overrides} />
+      <InlineRenderer
+        text={block.content}
+        {...(overrides ? { overrides } : {})}
+        {...(inlinePlugins ? { inlinePlugins } : {})}
+      />
     </p>
   );
 });
 
-// ── Code Block ───────────────────────────────────────────────
+// ── Code Block ──
+// Streaming-aware: while active, render plain code (no highlight per token).
+// On `closed`, run the highlighter once. This is the core of the "highlight
+// once, frozen" performance promise.
 
-interface CodeBlockComponentProps {
-  block: Block;
-  overrides?: Partial<ComponentOverrides>;
+interface CodeProps extends BlockProps {
+  highlighter?: HighlighterFn | undefined;
 }
 
-export const CodeBlockComponent = memo(function CodeBlockComponent({ block, overrides }: CodeBlockComponentProps) {
-  const language = block.meta.language || "";
+export const CodeBlockComponent = memo(function CodeBlockComponent({
+  block,
+  overrides,
+  isActive,
+  highlighter,
+}: CodeProps) {
+  const language = block.meta.language ?? "";
   const code = block.content.endsWith("\n")
     ? block.content.slice(0, -1)
     : block.content;
+  const streaming = !!isActive && !block.closed;
 
   const [copied, setCopied] = useState(false);
-
   const handleCopy = useCallback(() => {
-    navigator.clipboard.writeText(code).then(() => {
+    if (typeof navigator === "undefined" || !navigator.clipboard) return;
+    void navigator.clipboard.writeText(code).then(() => {
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     });
   }, [code]);
 
-  // Use custom override if provided
+  // Memoize highlighting on the closed code only. Hook must be unconditional.
+  const tokens = useMemo(() => {
+    if (streaming) return null; // render plain while streaming
+    const fn = highlighter ?? defaultHighlight;
+    return fn(code, language);
+  }, [streaming, code, language, highlighter]);
+
   const Pre = overrides?.pre;
   if (Pre) {
-    return <Pre block={block} language={language} code={code} />;
+    return <Pre block={block} language={language} code={code} streaming={streaming} />;
   }
 
-  const tokens = highlight(code, language);
-
   return (
-    <div className="smd-code-block">
+    <div className={`smd-code-block${streaming ? " smd-code-streaming" : ""}`}>
       <div className="smd-code-header">
         {language && <span className="smd-code-lang">{language}</span>}
         <button
+          type="button"
           className="smd-code-copy"
           onClick={handleCopy}
-          aria-label="Copy code"
+          aria-label={copied ? "Copied" : "Copy code"}
         >
-          {copied ? "✓ Copied" : "Copy"}
+          {copied ? "Copied" : "Copy"}
         </button>
       </div>
       <pre className="smd-pre">
         <code className={`smd-code language-${language}`}>
-          {tokens.map((t, i) =>
-            t.className ? (
-              <span key={i} className={t.className}>{t.text}</span>
-            ) : (
-              <React.Fragment key={i}>{t.text}</React.Fragment>
-            )
-          )}
+          {tokens === null
+            ? code
+            : tokens.map((t, i) =>
+                t.className ? (
+                  <span key={i} className={t.className}>
+                    {t.text}
+                  </span>
+                ) : (
+                  <React.Fragment key={i}>{t.text}</React.Fragment>
+                ),
+              )}
         </code>
       </pre>
     </div>
   );
 });
 
-// ── List ─────────────────────────────────────────────────────
+// ── List ──
 
-interface ListProps {
-  block: Block;
-  overrides?: Partial<ComponentOverrides>;
-}
+export const ListBlock = memo(function ListBlock({
+  block,
+  overrides,
+  inlinePlugins,
+}: BlockProps) {
+  const ordered = block.meta.ordered ?? false;
+  const items = useMemo<ParsedListItem[]>(() => {
+    if (block.closed && Array.isArray(block.meta.parsed)) {
+      return block.meta.parsed as ParsedListItem[];
+    }
+    return parseListItems(block.content);
+  }, [block.closed, block.content, block.meta.parsed]);
 
-export const ListBlock = memo(function ListBlock({ block, overrides }: ListProps) {
-  const ordered = block.meta.ordered || false;
-  const items = parseListItems(block.content);
   const Tag = ordered ? "ol" : "ul";
-
   return (
-    <Tag className={`smd-list smd-list-${ordered ? "ol" : "ul"}`}>
+    <Tag
+      className={`smd-list smd-list-${ordered ? "ol" : "ul"}`}
+      {...(ordered && block.meta.start && block.meta.start !== 1
+        ? { start: block.meta.start }
+        : {})}
+    >
       {items.map((item, i) => (
-        <li key={i} className="smd-list-item">
-          {item.isTask !== undefined && (
-            <input
-              type="checkbox"
-              checked={item.isTask}
-              readOnly
-              className="smd-task-checkbox"
-            />
-          )}
-          <InlineRenderer text={item.text} overrides={overrides} />
-        </li>
+        <ListItem
+          key={i}
+          item={item}
+          {...(overrides ? { overrides } : {})}
+          {...(inlinePlugins ? { inlinePlugins } : {})}
+        />
       ))}
     </Tag>
   );
 });
 
-interface ListItem {
-  text: string;
-  isTask?: boolean;
-}
-
-function parseListItems(content: string): ListItem[] {
-  const lines = content.split("\n");
-  const items: ListItem[] = [];
-
-  for (const line of lines) {
-    // Strip the list marker
-    const match = line.match(/^\s*(?:[-*+]|\d+[.)])\s+(.*)/);
-    if (match) {
-      let text = match[1]!;
-      let isTask: boolean | undefined;
-
-      // Task list
-      const taskMatch = text.match(/^\[([ xX])\]\s+(.*)/);
-      if (taskMatch) {
-        isTask = taskMatch[1] !== " ";
-        text = taskMatch[2]!;
-      }
-
-      items.push({ text, isTask });
-    }
-  }
-
-  return items;
-}
-
-// ── Table ────────────────────────────────────────────────────
-
-interface TableProps {
-  block: Block;
+interface ListItemProps {
+  item: ParsedListItem;
   overrides?: Partial<ComponentOverrides>;
+  inlinePlugins?: InlinePlugin[];
 }
 
-export const TableBlock = memo(function TableBlock({ block, overrides }: TableProps) {
-  const { headers, rows, alignments } = parseTable(block.content);
+function ListItem({ item, overrides, inlinePlugins }: ListItemProps) {
+  return (
+    <li className="smd-list-item">
+      {item.isTask !== undefined && (
+        <input
+          type="checkbox"
+          checked={!!item.taskChecked}
+          readOnly
+          aria-label={item.taskChecked ? "completed task" : "incomplete task"}
+          className="smd-task-checkbox"
+        />
+      )}
+      <InlineRenderer
+        text={item.text}
+        {...(overrides ? { overrides } : {})}
+        {...(inlinePlugins ? { inlinePlugins } : {})}
+      />
+      {item.children && item.children.length > 0 && (
+        <ul className="smd-list smd-list-ul">
+          {item.children.map((child, i) => (
+            <ListItem
+              key={i}
+              item={child}
+              {...(overrides ? { overrides } : {})}
+              {...(inlinePlugins ? { inlinePlugins } : {})}
+            />
+          ))}
+        </ul>
+      )}
+    </li>
+  );
+}
+
+// ── Table ──
+
+export const TableBlock = memo(function TableBlock({
+  block,
+  overrides,
+  inlinePlugins,
+}: BlockProps) {
+  const parsed = useMemo<ParsedTable>(() => {
+    if (block.closed && block.meta.parsed && typeof block.meta.parsed === "object") {
+      return block.meta.parsed as ParsedTable;
+    }
+    return parseTable(block.content);
+  }, [block.closed, block.content, block.meta.parsed]);
+  const { headers, rows, alignments } = parsed;
 
   const Tbl = overrides?.table;
-  if (Tbl) {
-    return <Tbl block={block} headers={headers} rows={rows} alignments={alignments} />;
-  }
+  if (Tbl) return <Tbl block={block} headers={headers} rows={rows} alignments={alignments} />;
+
+  const alignClass = (a: "left" | "center" | "right" | "none" | undefined) =>
+    a && a !== "none" ? `smd-align-${a}` : "";
 
   return (
     <div className="smd-table-wrapper">
@@ -181,8 +237,12 @@ export const TableBlock = memo(function TableBlock({ block, overrides }: TablePr
           <thead>
             <tr>
               {headers.map((h, i) => (
-                <th key={i} style={{ textAlign: alignments[i] || "left" }}>
-                  <InlineRenderer text={h} overrides={overrides} />
+                <th key={i} className={alignClass(alignments[i])}>
+                  <InlineRenderer
+                    text={h}
+                    {...(overrides ? { overrides } : {})}
+                    {...(inlinePlugins ? { inlinePlugins } : {})}
+                  />
                 </th>
               ))}
             </tr>
@@ -192,8 +252,12 @@ export const TableBlock = memo(function TableBlock({ block, overrides }: TablePr
           {rows.map((row, ri) => (
             <tr key={ri}>
               {row.map((cell, ci) => (
-                <td key={ci} style={{ textAlign: alignments[ci] || "left" }}>
-                  <InlineRenderer text={cell} overrides={overrides} />
+                <td key={ci} className={alignClass(alignments[ci])}>
+                  <InlineRenderer
+                    text={cell}
+                    {...(overrides ? { overrides } : {})}
+                    {...(inlinePlugins ? { inlinePlugins } : {})}
+                  />
                 </td>
               ))}
             </tr>
@@ -204,59 +268,39 @@ export const TableBlock = memo(function TableBlock({ block, overrides }: TablePr
   );
 });
 
-function parseTable(content: string): {
-  headers: string[];
-  rows: string[][];
-  alignments: ("left" | "center" | "right")[];
-} {
-  const lines = content.split("\n").filter(l => l.trim());
-  if (lines.length === 0) return { headers: [], rows: [], alignments: [] };
+// ── Blockquote ──
 
-  const parseCells = (line: string): string[] =>
-    line.split("|").map(s => s.trim()).filter((_, i, arr) =>
-      // Filter empty first/last from leading/trailing |
-      !((i === 0 || i === arr.length - 1) && arr[i]?.trim() === "")
-    );
-
-  const headers = parseCells(lines[0]!);
-
-  // Check for alignment row
-  let alignments: ("left" | "center" | "right")[] = [];
-  let dataStart = 1;
-
-  if (lines.length > 1 && /^[\s|:\-]+$/.test(lines[1]!)) {
-    const aligns = parseCells(lines[1]!);
-    alignments = aligns.map(a => {
-      const t = a.trim();
-      if (t.startsWith(":") && t.endsWith(":")) return "center";
-      if (t.endsWith(":")) return "right";
-      return "left";
-    });
-    dataStart = 2;
-  }
-
-  const rows = lines.slice(dataStart).map(parseCells);
-
-  return { headers, rows, alignments };
-}
-
-// ── Blockquote ───────────────────────────────────────────────
-
-interface BlockquoteProps {
-  block: Block;
-  overrides?: Partial<ComponentOverrides>;
-}
-
-export const BlockquoteBlock = memo(function BlockquoteBlock({ block, overrides }: BlockquoteProps) {
+export const BlockquoteBlock = memo(function BlockquoteBlock({
+  block,
+  overrides,
+  inlinePlugins,
+}: BlockProps) {
   return (
     <blockquote className="smd-blockquote">
-      <InlineRenderer text={block.content} overrides={overrides} />
+      <InlineRenderer
+        text={block.content}
+        {...(overrides ? { overrides } : {})}
+        {...(inlinePlugins ? { inlinePlugins } : {})}
+      />
     </blockquote>
   );
 });
 
-// ── Horizontal Rule ──────────────────────────────────────────
+// ── Horizontal Rule ──
 
 export const HorizontalRuleBlock = memo(function HorizontalRuleBlock() {
   return <hr className="smd-hr" />;
+});
+
+// ── HTML (sanitized — only when allowHtml=true at parser level; else won't reach here) ──
+
+export const HtmlBlock = memo(function HtmlBlock({ block }: BlockProps) {
+  // Without DOMPurify, we still escape and render as preformatted text rather
+  // than risk injecting raw HTML. Users who genuinely want raw HTML must wire
+  // a custom override.
+  return (
+    <div className="smd-html-block">
+      <pre>{block.content}</pre>
+    </div>
+  );
 });

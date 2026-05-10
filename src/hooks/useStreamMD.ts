@@ -1,84 +1,60 @@
-// ═══════════════════════════════════════════════════════════════
-// StreamMD — useStreamMD Hook
-// ═══════════════════════════════════════════════════════════════
+"use client";
 
-import { useRef, useMemo, useCallback, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { StreamParser } from "../parser/StreamParser";
 import type { Block, ParseResult, StreamMDOptions } from "../parser/types";
 
 export interface UseStreamMDReturn {
-  /** All parsed blocks */
   blocks: Block[];
-  /** Index of the currently active (streaming) block */
   activeIndex: number;
-  /** The current incomplete line (not yet committed to a block) */
   incompleteLine: string;
-  /** Push the full accumulated text (we diff internally) */
+  /** Push the full accumulated text. The parser internally diffs. */
   push: (fullText: string) => void;
-  /** Reset all parser state */
+  /** Reset all parser state. */
   reset: () => void;
 }
 
 /**
  * React hook for streaming markdown parsing.
- * Accepts the full accumulated text on each call to `push()`.
- * Internally diffs to only process new tokens.
  *
- * @example
- * ```tsx
- * const { blocks, activeIndex, incompleteLine, push, reset } = useStreamMD();
- *
- * useEffect(() => {
- *   const sse = new EventSource('/api/chat');
- *   let text = '';
- *   sse.onmessage = (e) => {
- *     text += e.data;
- *     push(text);
- *   };
- *   return () => sse.close();
- * }, [push]);
- * ```
+ * Use this when you want full control over rendering (or are not in React's
+ * happy path with `<StreamMD>` — e.g. when wiring an SSE source directly).
  */
 export function useStreamMD(options?: StreamMDOptions): UseStreamMDReturn {
   const parserRef = useRef<StreamParser | null>(null);
-  const [result, setResult] = useState<ParseResult & { incompleteLine: string }>({
-    blocks: [],
-    activeIndex: -1,
-    incompleteLine: "",
-  });
-
-  // Lazily initialize parser
   if (!parserRef.current) {
     parserRef.current = new StreamParser(options);
   }
 
-  const push = useCallback((fullText: string) => {
+  const [snapshot, setSnapshot] = useState<{
+    blocks: Block[];
+    activeIndex: number;
+    incompleteLine: string;
+  }>({ blocks: [], activeIndex: -1, incompleteLine: "" });
+
+  const push = useCallback((fullText: string): void => {
     const parser = parserRef.current!;
-    const newResult = parser.push(fullText);
-    // Create shallow copy to trigger React re-render
-    setResult({
-      blocks: [...newResult.blocks],
-      activeIndex: newResult.activeIndex,
+    const result: ParseResult = parser.push(fullText);
+    setSnapshot({
+      blocks: result.blocks.slice(),
+      activeIndex: result.activeIndex,
       incompleteLine: parser.getIncompleteLine(),
     });
   }, []);
 
   const reset = useCallback(() => {
     parserRef.current?.reset();
-    setResult({ blocks: [], activeIndex: -1, incompleteLine: "" });
+    setSnapshot({ blocks: [], activeIndex: -1, incompleteLine: "" });
   }, []);
 
   return useMemo(
     () => ({
-      blocks: result.blocks,
-      activeIndex: result.activeIndex,
-      incompleteLine: result.incompleteLine,
+      blocks: snapshot.blocks,
+      activeIndex: snapshot.activeIndex,
+      incompleteLine: snapshot.incompleteLine,
       push,
       reset,
     }),
-    [result, push, reset]
+    [snapshot, push, reset],
   );
 }
-
-
-

@@ -1,9 +1,10 @@
-/* ═══════════════════════════════════════════════════════════════
-   StreamMD — Default Styles
-   CSS Custom Properties for full theming control
-   ═══════════════════════════════════════════════════════════════ */
+/*
+ * stream-md — default styles
+ * All values are CSS custom properties so the entire theme can be retargeted
+ * without editing this file. CSP-safe (no inline styles emitted by components).
+ */
 
-/* ── Base ─────────────────────────────────────────────────── */
+/* ── Base ── */
 
 .stream-md {
   font-family: var(--smd-font, 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif);
@@ -18,7 +19,7 @@
   margin-top: 0.25em;
 }
 
-/* ── Streaming cursor ─────────────────────────────────────── */
+/* ── Streaming cursor ── */
 
 .smd-block-active::after {
   content: '';
@@ -31,12 +32,22 @@
   animation: smd-blink 1s steps(2) infinite;
 }
 
+.stream-md.smd-no-cursor .smd-block-active::after {
+  display: none;
+}
+
 @keyframes smd-blink {
   0% { opacity: 1; }
   50% { opacity: 0; }
 }
 
-/* ── Headings ─────────────────────────────────────────────── */
+/* ── Tentative tokens (speculative-close while streaming) ── */
+
+.smd-tentative {
+  /* No visual difference by default — present so users can style. */
+}
+
+/* ── Headings ── */
 
 .smd-heading {
   color: var(--smd-heading, #ffffff);
@@ -45,9 +56,7 @@
   margin: 1.2em 0 0.5em 0;
 }
 
-.smd-heading:first-child {
-  margin-top: 0;
-}
+.smd-heading:first-child { margin-top: 0; }
 
 .smd-h1 { font-size: 1.875em; letter-spacing: -0.02em; }
 .smd-h2 { font-size: 1.5em; letter-spacing: -0.01em; }
@@ -56,17 +65,12 @@
 .smd-h5 { font-size: 1em; }
 .smd-h6 { font-size: 0.9em; text-transform: uppercase; letter-spacing: 0.05em; }
 
-/* ── Paragraph ────────────────────────────────────────────── */
+/* ── Paragraph ── */
 
-.smd-paragraph {
-  margin: 0.5em 0;
-}
+.smd-paragraph { margin: 0.5em 0; }
+.smd-paragraph:first-child { margin-top: 0; }
 
-.smd-paragraph:first-child {
-  margin-top: 0;
-}
-
-/* ── Code Block ───────────────────────────────────────────── */
+/* ── Code Block ── */
 
 .smd-code-block {
   position: relative;
@@ -103,7 +107,7 @@
   border-radius: 6px;
   padding: 3px 10px;
   cursor: pointer;
-  transition: all 0.15s ease;
+  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
 }
 
 .smd-code-copy:hover {
@@ -127,19 +131,20 @@
   tab-size: 2;
 }
 
-/* ── Syntax Highlighting ──────────────────────────────────── */
+/* ── Syntax Highlighting ── */
 
-.smd-hl-keyword   { color: var(--smd-hl-keyword, #c084fc); }
-.smd-hl-string    { color: var(--smd-hl-string, #86efac); }
-.smd-hl-comment   { color: var(--smd-hl-comment, #64748b); font-style: italic; }
-.smd-hl-number    { color: var(--smd-hl-number, #fbbf24); }
-.smd-hl-builtin   { color: var(--smd-hl-builtin, #67e8f9); }
+.smd-hl-keyword     { color: var(--smd-hl-keyword, #c084fc); }
+.smd-hl-string      { color: var(--smd-hl-string, #86efac); }
+.smd-hl-comment     { color: var(--smd-hl-comment, #64748b); font-style: italic; }
+.smd-hl-number      { color: var(--smd-hl-number, #fbbf24); }
+.smd-hl-builtin     { color: var(--smd-hl-builtin, #67e8f9); }
+.smd-hl-tag         { color: var(--smd-hl-tag, #f97583); }
 .smd-hl-punctuation { color: var(--smd-hl-punctuation, #94a3b8); }
-.smd-hl-inserted  { color: #86efac; background: rgba(134, 239, 172, 0.1); }
-.smd-hl-deleted   { color: #fca5a5; background: rgba(252, 165, 165, 0.1); }
-.smd-hl-info      { color: #93c5fd; }
+.smd-hl-inserted    { color: #86efac; background: rgba(134, 239, 172, 0.1); display: inline-block; width: 100%; }
+.smd-hl-deleted     { color: #fca5a5; background: rgba(252, 165, 165, 0.1); display: inline-block; width: 100%; }
+.smd-hl-info        { color: #93c5fd; }
 
-/* ── Inline Code ──────────────────────────────────────────── */
+/* ── Inline Code ── */
 
 .smd-inline-code {
   font-family: var(--smd-code-font, 'JetBrains Mono', 'Fira Code', monospace);
@@ -151,7 +156,7 @@
   border: 1px solid var(--smd-border, rgba(255, 255, 255, 0.06));
 }
 
-/* ── Links ────────────────────────────────────────────────── */
+/* ── Links ── */
 
 .smd-link {
   color: var(--smd-link, #818cf8);
@@ -164,7 +169,7 @@
   border-bottom-color: var(--smd-link, #818cf8);
 }
 
-/* ── Images ───────────────────────────────────────────────── */
+/* ── Images ── */
 
 .smd-image {
   max-width: 100%;
@@ -173,7 +178,7 @@
   margin: 0.5em 0;
 }
 
-/* ── Lists ────────────────────────────────────────────────── */
+/* ── Lists ── */
 
 .smd-list {
   margin: 0.5em 0;
@@ -183,13 +188,11 @@
 .smd-list-ul { list-style-type: disc; }
 .smd-list-ol { list-style-type: decimal; }
 
-.smd-list-item {
-  margin: 0.25em 0;
-}
+.smd-list-item { margin: 0.25em 0; }
 
-.smd-list-item::marker {
-  color: var(--smd-list-marker, rgba(255, 255, 255, 0.3));
-}
+.smd-list-item::marker { color: var(--smd-list-marker, rgba(255, 255, 255, 0.3)); }
+
+.smd-list .smd-list { margin-top: 0.25em; margin-bottom: 0; }
 
 .smd-task-checkbox {
   appearance: none;
@@ -209,16 +212,18 @@
 }
 
 .smd-task-checkbox:checked::after {
-  content: '✓';
+  content: '';
   position: absolute;
-  top: -1px;
-  left: 2px;
-  font-size: 12px;
-  color: white;
-  font-weight: bold;
+  top: 1px;
+  left: 4px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 
-/* ── Table ────────────────────────────────────────────────── */
+/* ── Table ── */
 
 .smd-table-wrapper {
   margin: 1em 0;
@@ -247,11 +252,14 @@
   border-bottom: 1px solid var(--smd-border, rgba(255, 255, 255, 0.04));
 }
 
-.smd-table tr:last-child td {
-  border-bottom: none;
-}
+.smd-table tr:last-child td { border-bottom: none; }
 
-/* ── Blockquote ───────────────────────────────────────────── */
+/* CSP-safe column alignment */
+.smd-align-left   { text-align: left;   }
+.smd-align-center { text-align: center; }
+.smd-align-right  { text-align: right;  }
+
+/* ── Blockquote ── */
 
 .smd-blockquote {
   margin: 0.75em 0;
@@ -263,7 +271,7 @@
   font-style: italic;
 }
 
-/* ── Horizontal Rule ──────────────────────────────────────── */
+/* ── Horizontal Rule ── */
 
 .smd-hr {
   border: none;
@@ -272,25 +280,36 @@
   margin: 1.5em 0;
 }
 
-/* ── Bold / Italic / Strikethrough ────────────────────────── */
+/* ── Bold / Italic / Strikethrough ── */
 
-.stream-md strong {
-  color: var(--smd-heading, #ffffff);
-  font-weight: 600;
+.stream-md strong { color: var(--smd-heading, #ffffff); font-weight: 600; }
+.stream-md em { font-style: italic; }
+.stream-md del { opacity: 0.5; text-decoration: line-through; }
+
+/* ── Math (KaTeX) fallback when KaTeX is loading ── */
+.smd-math-fallback {
+  background: var(--smd-inline-code-bg, rgba(255, 255, 255, 0.08));
+  color: var(--smd-text, #e2e8f0);
+  padding: 0.15em 0.4em;
+  border-radius: 6px;
+  font-family: var(--smd-code-font, monospace);
 }
 
-.stream-md em {
-  font-style: italic;
+/* ── Mermaid ── */
+.smd-mermaid {
+  margin: 1em 0;
+  text-align: center;
+}
+.smd-mermaid-streaming {
+  opacity: 0.6;
+}
+.smd-mermaid-error {
+  border-left: 3px solid #ef4444;
+  background: rgba(239, 68, 68, 0.05);
+  padding: 0.5em 1em;
 }
 
-.stream-md del {
-  opacity: 0.5;
-  text-decoration: line-through;
-}
-
-/* ═══════════════════════════════════════════════════════════════
-   Theme: Dark (default)
-   ═══════════════════════════════════════════════════════════════ */
+/* ── Theme: Dark (default) ── */
 
 .smd-theme-dark {
   --smd-text: #e2e8f0;
@@ -312,11 +331,10 @@
   --smd-hl-comment: #64748b;
   --smd-hl-number: #fbbf24;
   --smd-hl-builtin: #67e8f9;
+  --smd-hl-tag: #f97583;
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   Theme: Light
-   ═══════════════════════════════════════════════════════════════ */
+/* ── Theme: Light ── */
 
 .smd-theme-light {
   --smd-text: #1e293b;
@@ -338,4 +356,5 @@
   --smd-hl-comment: #94a3b8;
   --smd-hl-number: #d97706;
   --smd-hl-builtin: #0891b2;
+  --smd-hl-tag: #dc2626;
 }

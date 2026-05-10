@@ -1,0 +1,5 @@
+html, body { margin: 0; padding: 0; background: #020817; color: #e2e8f0; font-family: system-ui, sans-serif; }
+main { max-width: 720px; margin: 0 auto; padding: 24px; }
+input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #1f2937; background: #0f172a; color: inherit; }
+form { margin-top: 16px; }
+.user { background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 8px; margin: 8px 0; }

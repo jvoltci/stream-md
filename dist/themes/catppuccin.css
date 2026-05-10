@@ -1,0 +1,47 @@
+/* Catppuccin Mocha (dark) + Latte (light) — https://catppuccin.com */
+
+.smd-theme-catppuccin-mocha {
+  --smd-text: #cdd6f4;
+  --smd-heading: #f5e0dc;
+  --smd-link: #89b4fa;
+  --smd-border: rgba(205, 214, 244, 0.08);
+  --smd-code-bg: #1e1e2e;
+  --smd-code-header-bg: #181825;
+  --smd-code-text: #cdd6f4;
+  --smd-code-lang-color: #6c7086;
+  --smd-inline-code-bg: rgba(245, 224, 220, 0.08);
+  --smd-inline-code-color: #f5c2e7;
+  --smd-blockquote-border: #cba6f7;
+  --smd-blockquote-bg: rgba(203, 166, 247, 0.05);
+  --smd-table-header-bg: #181825;
+  --smd-cursor: #cba6f7;
+  --smd-hl-keyword: #cba6f7;
+  --smd-hl-string: #a6e3a1;
+  --smd-hl-comment: #585b70;
+  --smd-hl-number: #fab387;
+  --smd-hl-builtin: #89dceb;
+  --smd-hl-tag: #f38ba8;
+}
+
+.smd-theme-catppuccin-latte {
+  --smd-text: #4c4f69;
+  --smd-heading: #1e1e2e;
+  --smd-link: #1e66f5;
+  --smd-border: rgba(76, 79, 105, 0.1);
+  --smd-code-bg: #eff1f5;
+  --smd-code-header-bg: #e6e9ef;
+  --smd-code-text: #4c4f69;
+  --smd-code-lang-color: #6c6f85;
+  --smd-inline-code-bg: rgba(76, 79, 105, 0.06);
+  --smd-inline-code-color: #ea76cb;
+  --smd-blockquote-border: #8839ef;
+  --smd-blockquote-bg: rgba(136, 57, 239, 0.05);
+  --smd-table-header-bg: #e6e9ef;
+  --smd-cursor: #8839ef;
+  --smd-hl-keyword: #8839ef;
+  --smd-hl-string: #40a02b;
+  --smd-hl-comment: #9ca0b0;
+  --smd-hl-number: #fe640b;
+  --smd-hl-builtin: #04a5e5;
+  --smd-hl-tag: #d20f39;
+}

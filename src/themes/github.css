@@ -1,0 +1,49 @@
+/* GitHub Dark + Light — https://primer.style */
+
+.smd-theme-github-dark {
+  --smd-text: #c9d1d9;
+  --smd-heading: #f0f6fc;
+  --smd-link: #58a6ff;
+  --smd-border: #30363d;
+  --smd-code-bg: #161b22;
+  --smd-code-header-bg: #0d1117;
+  --smd-code-text: #c9d1d9;
+  --smd-code-lang-color: #8b949e;
+  --smd-inline-code-bg: rgba(110, 118, 129, 0.4);
+  --smd-inline-code-color: #f0f6fc;
+  --smd-blockquote-border: #30363d;
+  --smd-blockquote-bg: transparent;
+  --smd-blockquote-text: #8b949e;
+  --smd-table-header-bg: #161b22;
+  --smd-cursor: #58a6ff;
+  --smd-hl-keyword: #ff7b72;
+  --smd-hl-string: #a5d6ff;
+  --smd-hl-comment: #8b949e;
+  --smd-hl-number: #79c0ff;
+  --smd-hl-builtin: #d2a8ff;
+  --smd-hl-tag: #7ee787;
+}
+
+.smd-theme-github-light {
+  --smd-text: #1f2328;
+  --smd-heading: #1f2328;
+  --smd-link: #0969da;
+  --smd-border: #d1d9e0;
+  --smd-code-bg: #f6f8fa;
+  --smd-code-header-bg: #eaeef2;
+  --smd-code-text: #1f2328;
+  --smd-code-lang-color: #59636e;
+  --smd-inline-code-bg: rgba(175, 184, 193, 0.2);
+  --smd-inline-code-color: #1f2328;
+  --smd-blockquote-border: #d1d9e0;
+  --smd-blockquote-bg: transparent;
+  --smd-blockquote-text: #59636e;
+  --smd-table-header-bg: #f6f8fa;
+  --smd-cursor: #0969da;
+  --smd-hl-keyword: #cf222e;
+  --smd-hl-string: #0a3069;
+  --smd-hl-comment: #59636e;
+  --smd-hl-number: #0550ae;
+  --smd-hl-builtin: #8250df;
+  --smd-hl-tag: #116329;
+}

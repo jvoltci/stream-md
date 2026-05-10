@@ -1,0 +1,47 @@
+/* Solarized Dark + Light — https://ethanschoonover.com/solarized */
+
+.smd-theme-solarized-dark {
+  --smd-text: #93a1a1;
+  --smd-heading: #eee8d5;
+  --smd-link: #268bd2;
+  --smd-border: rgba(147, 161, 161, 0.12);
+  --smd-code-bg: #002b36;
+  --smd-code-header-bg: #073642;
+  --smd-code-text: #93a1a1;
+  --smd-code-lang-color: #586e75;
+  --smd-inline-code-bg: rgba(7, 54, 66, 0.6);
+  --smd-inline-code-color: #d33682;
+  --smd-blockquote-border: #268bd2;
+  --smd-blockquote-bg: rgba(38, 139, 210, 0.05);
+  --smd-table-header-bg: #073642;
+  --smd-cursor: #268bd2;
+  --smd-hl-keyword: #859900;
+  --smd-hl-string: #2aa198;
+  --smd-hl-comment: #586e75;
+  --smd-hl-number: #d33682;
+  --smd-hl-builtin: #b58900;
+  --smd-hl-tag: #cb4b16;
+}
+
+.smd-theme-solarized-light {
+  --smd-text: #586e75;
+  --smd-heading: #073642;
+  --smd-link: #268bd2;
+  --smd-border: rgba(101, 123, 131, 0.12);
+  --smd-code-bg: #fdf6e3;
+  --smd-code-header-bg: #eee8d5;
+  --smd-code-text: #586e75;
+  --smd-code-lang-color: #93a1a1;
+  --smd-inline-code-bg: #eee8d5;
+  --smd-inline-code-color: #d33682;
+  --smd-blockquote-border: #268bd2;
+  --smd-blockquote-bg: rgba(38, 139, 210, 0.05);
+  --smd-table-header-bg: #eee8d5;
+  --smd-cursor: #268bd2;
+  --smd-hl-keyword: #859900;
+  --smd-hl-string: #2aa198;
+  --smd-hl-comment: #93a1a1;
+  --smd-hl-number: #d33682;
+  --smd-hl-builtin: #b58900;
+  --smd-hl-tag: #cb4b16;
+}

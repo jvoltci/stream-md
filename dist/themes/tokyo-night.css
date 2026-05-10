@@ -1,0 +1,47 @@
+/* Tokyo Night — https://github.com/tokyo-night */
+
+.smd-theme-tokyo-night {
+  --smd-text: #c0caf5;
+  --smd-heading: #ffffff;
+  --smd-link: #7aa2f7;
+  --smd-border: rgba(192, 202, 245, 0.08);
+  --smd-code-bg: #1a1b26;
+  --smd-code-header-bg: #16161e;
+  --smd-code-text: #c0caf5;
+  --smd-code-lang-color: #565f89;
+  --smd-inline-code-bg: rgba(192, 202, 245, 0.06);
+  --smd-inline-code-color: #bb9af7;
+  --smd-blockquote-border: #7aa2f7;
+  --smd-blockquote-bg: rgba(122, 162, 247, 0.05);
+  --smd-table-header-bg: #16161e;
+  --smd-cursor: #7aa2f7;
+  --smd-hl-keyword: #bb9af7;
+  --smd-hl-string: #9ece6a;
+  --smd-hl-comment: #565f89;
+  --smd-hl-number: #ff9e64;
+  --smd-hl-builtin: #7dcfff;
+  --smd-hl-tag: #f7768e;
+}
+
+.smd-theme-tokyo-night-storm {
+  --smd-text: #c0caf5;
+  --smd-heading: #ffffff;
+  --smd-link: #7aa2f7;
+  --smd-border: rgba(192, 202, 245, 0.08);
+  --smd-code-bg: #24283b;
+  --smd-code-header-bg: #1f2335;
+  --smd-code-text: #c0caf5;
+  --smd-code-lang-color: #565f89;
+  --smd-inline-code-bg: rgba(192, 202, 245, 0.06);
+  --smd-inline-code-color: #bb9af7;
+  --smd-blockquote-border: #7aa2f7;
+  --smd-blockquote-bg: rgba(122, 162, 247, 0.05);
+  --smd-table-header-bg: #1f2335;
+  --smd-cursor: #7aa2f7;
+  --smd-hl-keyword: #bb9af7;
+  --smd-hl-string: #9ece6a;
+  --smd-hl-comment: #565f89;
+  --smd-hl-number: #ff9e64;
+  --smd-hl-builtin: #7dcfff;
+  --smd-hl-tag: #f7768e;
+}

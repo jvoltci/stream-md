@@ -12,14 +12,18 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": false,
+    "exactOptionalPropertyTypes": false,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "outDir": "dist",
-    "rootDir": "src",
+    "rootDir": ".",
     "resolveJsonModule": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "demo"]
+  "include": ["src", "tests", "bench"],
+  "exclude": ["node_modules", "dist", "demo", "examples"]
 }

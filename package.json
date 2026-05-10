@@ -1,30 +1,45 @@
 {
   "name": "stream-md",
-  "version": "0.1.0",
-  "description": "Streaming markdown renderer for LLM token streams. Incremental parsing, zero flicker, built-in syntax highlighting.",
+  "version": "0.2.0",
+  "description": "Streaming markdown renderer for LLM token streams. Incremental parsing, zero flicker, built-in syntax highlighting, first-class Next.js / RSC support.",
   "keywords": [
     "markdown",
     "streaming",
     "llm",
     "react",
+    "nextjs",
+    "rsc",
     "incremental",
     "chat",
     "ai",
     "gpt",
     "claude",
+    "openai",
+    "anthropic",
+    "vercel-ai-sdk",
     "syntax-highlighting",
-    "zero-flicker"
+    "shiki",
+    "katex",
+    "mermaid",
+    "zero-flicker",
+    "commonmark",
+    "gfm"
   ],
   "author": "Jai",
   "license": "MIT",
+  "homepage": "https://github.com/jvoltci/stream-md#readme",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jvoltci/stream-md"
+    "url": "git+https://github.com/jvoltci/stream-md.git"
   },
   "bugs": {
     "url": "https://github.com/jvoltci/stream-md/issues"
   },
+  "funding": "https://github.com/sponsors/jvoltci",
   "type": "module",
+  "sideEffects": [
+    "**/*.css"
+  ],
   "main": "./dist/index.cjs",
   "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -39,29 +54,158 @@
         "default": "./dist/index.cjs"
       }
     },
-    "./styles.css": "./dist/stream-md.css"
+    "./core": {
+      "import": {
+        "types": "./dist/core.d.ts",
+        "default": "./dist/core.js"
+      },
+      "require": {
+        "types": "./dist/core.d.cts",
+        "default": "./dist/core.cjs"
+      }
+    },
+    "./server": {
+      "import": {
+        "types": "./dist/server.d.ts",
+        "default": "./dist/server.js"
+      },
+      "require": {
+        "types": "./dist/server.d.cts",
+        "default": "./dist/server.cjs"
+      }
+    },
+    "./next": {
+      "import": {
+        "types": "./dist/next.d.ts",
+        "default": "./dist/next.js"
+      },
+      "require": {
+        "types": "./dist/next.d.cts",
+        "default": "./dist/next.cjs"
+      }
+    },
+    "./strict": {
+      "import": {
+        "types": "./dist/strict.d.ts",
+        "default": "./dist/strict.js"
+      },
+      "require": {
+        "types": "./dist/strict.d.cts",
+        "default": "./dist/strict.cjs"
+      }
+    },
+    "./shiki": {
+      "import": {
+        "types": "./dist/shiki.d.ts",
+        "default": "./dist/shiki.js"
+      },
+      "require": {
+        "types": "./dist/shiki.d.cts",
+        "default": "./dist/shiki.cjs"
+      }
+    },
+    "./katex": {
+      "import": {
+        "types": "./dist/katex.d.ts",
+        "default": "./dist/katex.js"
+      },
+      "require": {
+        "types": "./dist/katex.d.cts",
+        "default": "./dist/katex.cjs"
+      }
+    },
+    "./mermaid": {
+      "import": {
+        "types": "./dist/mermaid.d.ts",
+        "default": "./dist/mermaid.js"
+      },
+      "require": {
+        "types": "./dist/mermaid.d.cts",
+        "default": "./dist/mermaid.cjs"
+      }
+    },
+    "./styles.css": "./dist/stream-md.css",
+    "./themes/catppuccin.css": "./dist/themes/catppuccin.css",
+    "./themes/tokyo-night.css": "./dist/themes/tokyo-night.css",
+    "./themes/github.css": "./dist/themes/github.css",
+    "./themes/solarized.css": "./dist/themes/solarized.css"
   },
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "SECURITY.md"
   ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "npm run build"
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:cov": "vitest run --coverage",
+    "lint": "eslint . --max-warnings=0",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\" \"tests/**/*.{ts,tsx}\" \"*.{json,md}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\" \"tests/**/*.{ts,tsx}\" \"*.{json,md}\"",
+    "size": "size-limit",
+    "bench": "vitest bench --run",
+    "changeset": "changeset",
+    "release": "changeset publish",
+    "prepublishOnly": "npm run build && npm run test"
   },
   "peerDependencies": {
+    "@types/katex": "*",
+    "katex": "^0.16.0",
+    "mermaid": "^10.0.0 || ^11.0.0",
     "react": ">=18.0.0",
-    "react-dom": ">=18.0.0"
+    "react-dom": ">=18.0.0",
+    "shiki": "^1.0.0 || ^2.0.0 || ^3.0.0"
+  },
+  "peerDependenciesMeta": {
+    "katex": {
+      "optional": true
+    },
+    "@types/katex": {
+      "optional": true
+    },
+    "mermaid": {
+      "optional": true
+    },
+    "shiki": {
+      "optional": true
+    }
   },
   "devDependencies": {
+    "@changesets/cli": "^2.27.0",
+    "@size-limit/preset-small-lib": "^11.0.0",
+    "@testing-library/jest-dom": "^6.4.0",
+    "@testing-library/react": "^16.0.0",
+    "@types/node": "^25.6.2",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "eslint": "^9.0.0",
+    "eslint-plugin-react": "^7.35.0",
+    "eslint-plugin-react-hooks": "^5.0.0",
+    "fast-check": "^3.21.0",
+    "jsdom": "^25.0.0",
+    "markdown-it": "^14.0.0",
+    "marked": "^14.0.0",
+    "prettier": "^3.3.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-markdown": "^9.0.0",
+    "size-limit": "^11.0.0",
+    "tinybench": "^3.0.0",
     "tsup": "^8.0.0",
-    "typescript": "^5.5.0"
+    "typescript": "^5.5.0",
+    "vitest": "^2.1.0"
   }
 }

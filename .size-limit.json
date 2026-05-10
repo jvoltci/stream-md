@@ -1,0 +1,21 @@
+[
+  {
+    "name": "stream-md (default React entry)",
+    "path": "dist/index.js",
+    "limit": "12 KB",
+    "import": "{ StreamMD, useStreamMD }",
+    "ignore": ["react", "react-dom", "react/jsx-runtime"]
+  },
+  {
+    "name": "stream-md/core (framework-agnostic)",
+    "path": "dist/core.js",
+    "limit": "8 KB",
+    "import": "{ StreamParser, parseInline, sanitizeUrl }"
+  },
+  {
+    "name": "stream-md/server (RSC parser)",
+    "path": "dist/server.js",
+    "limit": "5 KB",
+    "import": "{ parseToBlocks }"
+  }
+]
