@@ -9,7 +9,7 @@ Incremental block parsing · Speculative inline closure · React 19 + Next.js Ap
 [![npm](https://img.shields.io/npm/v/stream-md?color=8a2be2)](https://www.npmjs.com/package/stream-md)
 [![bundle](https://img.shields.io/bundlephobia/minzip/stream-md?color=22c55e)](https://bundlephobia.com/package/stream-md)
 [![types](https://img.shields.io/npm/types/stream-md?color=3178c6)](#)
-[![ci](https://github.com/jvoltci/stream-md/actions/workflows/ci.yml/badge.svg)](https://github.com/jvoltci/stream-md/actions/workflows/ci.yml)
+[![ci](https://github.com/lognjais/stream-md/actions/workflows/ci.yml/badge.svg)](https://github.com/lognjais/stream-md/actions/workflows/ci.yml)
 [![license](https://img.shields.io/npm/l/stream-md)](LICENSE)
 
 [Live demo](https://altrusian.com/stream-md) · [API](#api) · [Plugin guide](#extensions) · [Threat model](SECURITY.md)

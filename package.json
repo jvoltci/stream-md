@@ -27,13 +27,13 @@
   ],
   "author": "Jai",
   "license": "MIT",
-  "homepage": "https://github.com/jvoltci/stream-md#readme",
+  "homepage": "https://github.com/lognjais/stream-md#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/jvoltci/stream-md.git"
+    "url": "git+https://github.com/lognjais/stream-md.git"
   },
   "bugs": {
-    "url": "https://github.com/jvoltci/stream-md/issues"
+    "url": "https://github.com/lognjais/stream-md/issues"
   },
   "funding": "https://github.com/sponsors/jvoltci",
   "type": "module",
